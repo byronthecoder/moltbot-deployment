@@ -92,10 +92,10 @@ WEBHOOK_SECRET=<see_.env_file>
 - [x] Webhook validates secret header
 - [x] Webhook checks Codespace status
 - [x] Webhook can detect running Codespace
-- [ ] **TODO:** Test webhook starts stopped Codespace
-- [ ] **TODO:** Verify startup.sh executes on boot
-- [ ] **TODO:** Confirm gateway auto-starts
-- [ ] **TODO:** Test end-to-end message flow
+- [x] ✅ **TESTED:** Webhook starts stopped Codespace
+- [x] ✅ **TESTED:** startup.sh executes on boot
+- [x] ✅ **TESTED:** Gateway auto-starts (PID 1733, port 18789)
+- [ ] **TODO:** Test end-to-end message flow via Telegram
 
 ## Remaining Tasks
 
@@ -198,6 +198,8 @@ npx wrangler deploy
 - ✅ Webhook deployed and functional
 - ✅ Auto-start script configured
 - ✅ Keepalive removed
+- ✅ **Auto-start tested successfully** (Shutdown → Available transition verified)
+- ✅ **Gateway auto-start confirmed** (PID 1733, listening on port 18789)
 - ⏳ Codespace timeout (pending configuration)
 - ⏳ Telegram/WhatsApp integration (pending)
 - ⏳ Cost validation (pending 1 week of monitoring)
