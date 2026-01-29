@@ -1,0 +1,10 @@
+name = "codespace-autostarter"
+main = "cloudflare-worker.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+CODESPACE_NAME = "orange-enigma-jqj77jg6gj42prv4"
+
+# Secrets (GITHUB_TOKEN and WEBHOOK_SECRET) must be set via:
+# npx wrangler secret put GITHUB_TOKEN
+# npx wrangler secret put WEBHOOK_SECRET
