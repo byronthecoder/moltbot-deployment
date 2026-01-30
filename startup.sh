@@ -25,19 +25,18 @@ fi
 # Start the gateway in the background
 echo "🚀 Starting moltbot gateway..."
 nohup clawdbot gateway > ~/gateway.log 2>&1 &
+GATEWAY_PID=$!
 
 # Wait a moment and check if it started
-sleep 2
+sleep 5
 
-if pgrep -f "clawdbot gateway" > /dev/null; then
+if pgrep -f "clawdbot-gateway" > /dev/null; then
     echo "✅ Moltbot gateway started successfully!"
     echo "📋 Gateway URL: ws://0.0.0.0:18789"
     echo "📝 Logs: ~/gateway.log"
-    
-    # Show gateway status
-    clawdbot gateway list 2>/dev/null || true
+    echo "🔢 PID: $(pgrep -f 'clawdbot-gateway')"
 else
     echo "❌ Failed to start moltbot gateway"
     echo "📝 Check logs: ~/gateway.log"
-    exit 1
+    # Don't exit 1 - allow bashrc to continue
 fi
