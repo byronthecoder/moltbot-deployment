@@ -1,0 +1,4 @@
+{
+  "name": "MoltBot Deployment",
+  "postStartCommand": "bash /workspaces/moltbot-deployment/startup.sh"
+}
