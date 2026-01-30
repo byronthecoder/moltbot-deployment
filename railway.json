@@ -1,13 +1,10 @@
-# Railway Deployment for Telegram Poller
-
-This directory contains a Telegram poller that wakes your Codespace when messages arrive.
-
-## Environment Variables
-
-Set these in Railway dashboard:
-
-```
-TELEGRAM_BOT_TOKEN=8544560105:AAGpfvhoA9I5k895YzUz97CZ0n49O6Wg9sI
-WEBHOOK_URL=https://codespace-autostarter.byron-zheng-yuan.workers.dev/
-WEBHOOK_SECRET=<from webhook-autostarter/.env>
-```
+{
+	"projectId": "a13c1ca2-8397-45f2-9fd5-e08a1c4c1539",
+	"projectName": "TG_Bot",
+	"services": [
+		{
+			"name": "telegram-poller",
+			"type": "service"
+		}
+	]
+}

@@ -14,7 +14,7 @@ echo "   railway init"
 echo ""
 echo "3. Set environment variables:"
 WEBHOOK_SECRET=$(grep WEBHOOK_SECRET webhook-autostarter/.env | cut -d= -f2)
-echo "   railway variables set TELEGRAM_BOT_TOKEN='8544560105:AAGpfvhoA9I5k895YzUz97CZ0n49O6Wg9sI'"
+echo "   railway variables set TELEGRAM_BOT_TOKEN='8517178230:AAHg5D430gmxnGs92AUh-j3RsWPr2qx7fBI'"
 echo "   railway variables set WEBHOOK_URL='https://codespace-autostarter.byron-zheng-yuan.workers.dev/'"
 echo "   railway variables set WEBHOOK_SECRET='$WEBHOOK_SECRET'"
 echo ""
