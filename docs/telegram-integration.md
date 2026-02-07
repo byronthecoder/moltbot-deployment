@@ -1,9 +1,11 @@
 # Telegram Integration Guide
 
 ## Overview
+
 Configure your Telegram bot to send webhooks to the Cloudflare Worker, which will auto-start your Codespace when a message arrives.
 
 ## Architecture
+
 ```
 Telegram Message → Telegram Bot Webhook → Cloudflare Worker → GitHub API → Start Codespace
                                                                            ↓
@@ -13,6 +15,7 @@ Telegram Message → Telegram Bot Webhook → Cloudflare Worker → GitHub API �
 ## Option 1: Using Telegram Bot API Webhook (Recommended)
 
 ### Prerequisites
+
 - Telegram Bot Token (from @BotFather)
 - Your bot must be set up with moltbot
 
@@ -49,18 +52,18 @@ Add a webhook call inside your moltbot Telegram message handler:
 // Pseudo-code for moltbot plugin/extension
 async function onTelegramMessage(message) {
   // Trigger Codespace wake-up
-  await fetch('https://codespace-autostarter.byron-zheng-yuan.workers.dev/', {
-    method: 'POST',
+  await fetch("https://codespace-autostarter.byron-zheng-yuan.workers.dev/", {
+    method: "POST",
     headers: {
-      'X-Webhook-Secret': 'd64346eb8afb50339f691b4e682570787aeb99c8d27a00a5221b1a713962decc',
-      'Content-Type': 'application/json'
+      "X-Webhook-Secret": "your_webhook_secret_here",
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify({ source: 'telegram', user: message.from.id })
+    body: JSON.stringify({ source: "telegram", user: message.from.id }),
   });
-  
+
   // Wait a moment for Codespace to start (if it was stopped)
   await sleep(2000);
-  
+
   // Continue with normal message processing
   return processMessage(message);
 }
@@ -69,6 +72,7 @@ async function onTelegramMessage(message) {
 ## Option 3: External Proxy Service
 
 Use a service like n8n, Zapier, or Make (Integromat) to:
+
 1. Receive Telegram webhooks
 2. Forward to Cloudflare Worker with secret header
 3. Forward original message to moltbot gateway
@@ -89,28 +93,29 @@ OFFSET=0
 while true; do
   # Get updates from Telegram
   RESPONSE=$(curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${OFFSET}&timeout=30")
-  
+
   # Check if there are new messages
   MESSAGE_COUNT=$(echo "$RESPONSE" | jq '.result | length')
-  
+
   if [ "$MESSAGE_COUNT" -gt 0 ]; then
     echo "New message detected! Triggering Codespace wake-up..."
-    
+
     # Trigger Codespace
     curl -X POST "$WEBHOOK_URL" \
       -H "X-Webhook-Secret: $WEBHOOK_SECRET" \
       -H "Content-Type: application/json" \
       -d '{"source":"telegram-poller"}'
-    
+
     # Update offset
     OFFSET=$(echo "$RESPONSE" | jq '.result[-1].update_id + 1')
   fi
-  
+
   sleep 1
 done
 ```
 
 Run this on a cheap always-on server ($5/month) or free tier service like:
+
 - Railway.app (free tier)
 - Fly.io (free tier)
 - Oracle Cloud (always free tier)
@@ -128,6 +133,7 @@ After configuring, test the integration:
 ## Recommended Approach
 
 For your use case, I recommend **Option 4 (Polling Script)** because:
+
 - ✅ Simple to implement
 - ✅ Works with standard Telegram Bot API
 - ✅ No webhook URL requirements
@@ -146,4 +152,4 @@ The poller is lightweight and will quickly detect messages to wake your Codespac
 ---
 
 **Webhook URL:** https://codespace-autostarter.byron-zheng-yuan.workers.dev/  
-**Secret:** d64346eb8afb50339f691b4e682570787aeb99c8d27a00a5221b1a713962decc
+**Secret:** your_webhook_secret_here

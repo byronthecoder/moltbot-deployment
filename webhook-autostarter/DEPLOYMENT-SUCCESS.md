@@ -1,6 +1,7 @@
 # Webhook Auto-Starter - Deployment Success ✅
 
 ## Summary
+
 The Cloudflare Worker webhook auto-starter has been successfully deployed and tested!
 
 **Webhook URL:** https://codespace-autostarter.byron-zheng-yuan.workers.dev/
@@ -8,15 +9,19 @@ The Cloudflare Worker webhook auto-starter has been successfully deployed and te
 ## Configuration
 
 ### Environment Variables (Deployed via Wrangler CLI)
+
 - ✅ `GITHUB_TOKEN`: GitHub Personal Access Token (see `.env` file)
-- ✅ `CODESPACE_NAME`: orange-enigma-jqj77jg6gj42prv4  
+- ✅ `CODESPACE_NAME`: orange-enigma-jqj77jg6gj42prv4
 - ✅ `WEBHOOK_SECRET`: Webhook secret for validation (see `.env` file)
 
-**Note:** Actual secrets stored in `.env` file (gitignored for security)  
-- ✅ `WEBHOOK_SECRET`: d64346eb8afb50339f691b4e682570787aeb99c8d27a00a5221b1a713962decc
+**Note:** Actual secrets stored in `.env` file (gitignored for security)
+
+- ✅ `WEBHOOK_SECRET`: your_webhook_secret_here
 
 ### Deployment Method
+
 Used Wrangler CLI (npx wrangler) for deployment:
+
 1. Authenticated: `npx wrangler login`
 2. Set secrets: `echo "TOKEN" | npx wrangler secret put GITHUB_TOKEN`
 3. Deploy: `npx wrangler deploy`
@@ -24,13 +29,15 @@ Used Wrangler CLI (npx wrangler) for deployment:
 ## Testing
 
 ### Test Command
+
 ```bash
 curl -X POST "https://codespace-autostarter.byron-zheng-yuan.workers.dev/" \
-  -H "X-Webhook-Secret: d64346eb8afb50339f691b4e682570787aeb99c8d27a00a5221b1a713962decc" \
+  -H "X-Webhook-Secret: your_webhook_secret_here" \
   -d '{"test": true}'
 ```
 
 ### Test Result
+
 ```json
 {
   "status": "running",
@@ -68,10 +75,11 @@ For Telegram Bot or WhatsApp webhook configuration:
 
 **URL:** https://codespace-autostarter.byron-zheng-yuan.workers.dev/  
 **Method:** POST  
-**Header:** `X-Webhook-Secret: d64346eb8afb50339f691b4e682570787aeb99c8d27a00a5221b1a713962decc`  
+**Header:** `X-Webhook-Secret: your_webhook_secret_here`  
 **Body:** Any JSON payload (e.g., `{"source": "telegram"}`)
 
 The webhook will:
+
 1. Validate the secret
 2. Check if Codespace is running
 3. Start it if stopped (takes ~30 seconds)
@@ -80,17 +88,20 @@ The webhook will:
 ## Troubleshooting
 
 ### View Logs
+
 ```bash
 cd /workspaces/moltbot-deployment/webhook-autostarter
 npx wrangler tail --format pretty
 ```
 
 ### Update Secrets
+
 ```bash
 echo "NEW_VALUE" | npx wrangler secret put SECRET_NAME
 ```
 
 ### Redeploy
+
 ```bash
 npx wrangler deploy
 ```

@@ -1,6 +1,7 @@
 # Quick Setup: Telegram → Codespace Auto-Start
 
 ## How It Works
+
 ```
 Telegram Message → Poller Script → Cloudflare Webhook → Start Codespace → Moltbot Responds
 ```
@@ -17,10 +18,11 @@ You already have a Telegram bot configured with moltbot. Find your bot token:
 
 ```bash
 # Check your moltbot config
-cat ~/.clawdbot/clawdbot.json | jq '.agents[] | select(.name=="telegram")' 
+cat ~/.clawdbot/clawdbot.json | jq '.agents[] | select(.name=="telegram")'
 ```
 
 Or get it from @BotFather on Telegram:
+
 1. Message @BotFather
 2. Send `/mybots`
 3. Select your bot → API Token
@@ -32,16 +34,19 @@ Copy the token (format: `123456789:ABCdefGHIjklMNOpqrsTUVwxyz`)
 **Option A: Use Railway (Recommended - Easy)**
 
 1. **Install Railway CLI:**
+
    ```bash
    npm install -g @railway/cli
    ```
 
 2. **Login:**
+
    ```bash
    railway login
    ```
 
 3. **Deploy:**
+
    ```bash
    cd /workspaces/moltbot-deployment
    railway init
@@ -49,6 +54,7 @@ Copy the token (format: `123456789:ABCdefGHIjklMNOpqrsTUVwxyz`)
    ```
 
 4. **Set Environment Variables:**
+
    ```bash
    railway variables set TELEGRAM_BOT_TOKEN="YOUR_BOT_TOKEN_HERE"
    railway variables set WEBHOOK_URL="https://codespace-autostarter.byron-zheng-yuan.workers.dev/"
@@ -67,24 +73,27 @@ Railway free tier: 500 hours/month (plenty for 24/7 operation)
 **Option B: Use Fly.io (Also Free)**
 
 1. **Install Fly CLI:**
+
    ```bash
    curl -L https://fly.io/install.sh | sh
    ```
 
 2. **Login:**
+
    ```bash
    flyctl auth login
    ```
 
 3. **Create Dockerfile:**
+
    ```bash
    cat > Dockerfile.poller << 'EOF'
-FROM alpine:latest
-RUN apk add --no-cache bash curl jq
-COPY telegram-poller.sh /app/telegram-poller.sh
-RUN chmod +x /app/telegram-poller.sh
-CMD ["/app/telegram-poller.sh"]
-EOF
+   FROM alpine:latest
+   RUN apk add --no-cache bash curl jq
+   COPY telegram-poller.sh /app/telegram-poller.sh
+   RUN chmod +x /app/telegram-poller.sh
+   CMD ["/app/telegram-poller.sh"]
+   EOF
    ```
 
 4. **Deploy:**
@@ -116,6 +125,7 @@ nohup ./telegram-poller.sh > telegram-poller.log 2>&1 &
 ```
 
 To make it persistent, add to crontab:
+
 ```bash
 @reboot cd /path/to/script && ./telegram-poller.sh >> telegram-poller.log 2>&1
 ```
@@ -125,6 +135,7 @@ To make it persistent, add to crontab:
 ## Step 3: Test It
 
 1. **Stop your Codespace:**
+
    ```bash
    gh codespace stop -c orange-enigma-jqj77jg6gj42prv4
    ```
@@ -164,21 +175,25 @@ To make it persistent, add to crontab:
 ## Monitoring
 
 ### Check poller logs (Railway):
+
 ```bash
 railway logs
 ```
 
 ### Check poller logs (Fly.io):
+
 ```bash
 flyctl logs
 ```
 
 ### Check poller logs (own server):
+
 ```bash
 tail -f telegram-poller.log
 ```
 
 ### Check Codespace was started:
+
 ```bash
 gh codespace list
 ```
@@ -187,30 +202,34 @@ gh codespace list
 
 ## Cost Summary
 
-| Service | Cost | Purpose |
-|---------|------|---------|
-| Railway/Fly.io | $0 (free tier) | Run poller |
-| Cloudflare Worker | $0 (free tier) | Handle webhook |
-| GitHub Codespace | $11-22/month | On-demand (2-4 hrs/day) |
-| **Total** | **$11-22/month** | 85% savings vs $130/month |
+| Service           | Cost             | Purpose                   |
+| ----------------- | ---------------- | ------------------------- |
+| Railway/Fly.io    | $0 (free tier)   | Run poller                |
+| Cloudflare Worker | $0 (free tier)   | Handle webhook            |
+| GitHub Codespace  | $11-22/month     | On-demand (2-4 hrs/day)   |
+| **Total**         | **$11-22/month** | 85% savings vs $130/month |
 
 ---
 
 ## Troubleshooting
 
 ### Poller not detecting messages
+
 - Check bot token is correct
 - Verify bot is not in privacy mode (talk to @BotFather)
 
 ### Webhook not triggering
+
 - Check webhook secret is correct
 - View webhook logs: `cd webhook-autostarter && npx wrangler tail`
 
 ### Codespace not starting
+
 - Verify GitHub token has `codespace` scope
 - Check token hasn't expired
 
 ### Bot not responding after 60 seconds
+
 - SSH into Codespace: `gh codespace ssh`
 - Check gateway: `ps aux | grep clawdbot`
 - Check logs: `tail ~/gateway.log`
@@ -220,13 +239,15 @@ gh codespace list
 ## Quick Reference
 
 **Environment Variables for Poller:**
+
 ```bash
-TELEGRAM_BOT_TOKEN=123456789:ABC...  # From @BotFather
-WEBHOOK_URL=https://codespace-autostarter.byron-zheng-yuan.workers.dev/
-WEBHOOK_SECRET=d64346eb8afb50339f691b4e682570787aeb99c8d27a00a5221b1a713962decc
+TELEGRAM_BOT_TOKEN=your_bot_token_here  # From @BotFather
+WEBHOOK_URL=your_webhook_url_here
+WEBHOOK_SECRET=your_webhook_secret_here
 ```
 
 **Files:**
+
 - Poller script: `/workspaces/moltbot-deployment/telegram-poller.sh`
 - Webhook secrets: `/workspaces/moltbot-deployment/webhook-autostarter/.env`
 

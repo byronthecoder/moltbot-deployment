@@ -7,18 +7,21 @@ A complete auto-start/auto-stop solution for your moltbot deployment that reduce
 ## Components Deployed
 
 ### 1. ✅ Cloudflare Worker Auto-Starter
+
 - **URL:** https://codespace-autostarter.byron-zheng-yuan.workers.dev/
 - **Function:** Receives webhooks and starts Codespace via GitHub API
 - **Status:** Production ready and tested
 - **Key Fix:** Added User-Agent header for GitHub API compatibility
 
 ### 2. ✅ Startup Script
+
 - **Location:** `/workspaces/moltbot-deployment/startup.sh`
 - **Function:** Auto-starts moltbot gateway when Codespace boots
 - **Integration:** Added to `.bashrc` for automatic execution
 - **Features:** Process checking, error handling, status logging
 
 ### 3. ✅ Removed Keepalive Cron
+
 - **Before:** Keepalive cron prevented auto-stop
 - **After:** Only weather cron remains (runs at 8 AM Paris time if Codespace active)
 - **Impact:** Codespace can now auto-stop after inactivity
@@ -26,7 +29,9 @@ A complete auto-start/auto-stop solution for your moltbot deployment that reduce
 ## Configuration Summary
 
 ### Environment Variables (Cloudflare Worker)
+
 Stored in `/workspaces/moltbot-deployment/webhook-autostarter/.env` (gitignored):
+
 ```
 GITHUB_TOKEN=<see_.env_file>
 CODESPACE_NAME=orange-enigma-jqj77jg6gj42prv4
@@ -36,11 +41,13 @@ WEBHOOK_SECRET=<see_.env_file>
 **Security:** `.env` file is excluded from git via `.gitignore`
 
 ### GitHub Codespace
+
 - **Codespace ID:** orange-enigma-jqj77jg6gj42prv4
 - **Repository:** byronthecoder/moltbot-deployment
 - **Timeout:** ⏳ **TODO: Set to 30 minutes** at https://github.com/settings/codespaces
 
 ### Moltbot Gateway
+
 - **Port:** 18789
 - **Bind:** lan mode
 - **Token:** 0656ee85d535c0bbbf85f47564b803cc797faa3a601f4c65
@@ -49,6 +56,7 @@ WEBHOOK_SECRET=<see_.env_file>
 ## How It Works
 
 ### Normal Operation Flow
+
 ```
 1. User sends message to Telegram/WhatsApp
 2. Message triggers webhook to Cloudflare Worker
@@ -61,6 +69,7 @@ WEBHOOK_SECRET=<see_.env_file>
 ```
 
 ### Auto-Stop Flow
+
 ```
 1. No messages/activity for 30 minutes
 2. GitHub auto-stops Codespace
@@ -71,17 +80,20 @@ WEBHOOK_SECRET=<see_.env_file>
 ## Cost Breakdown
 
 ### Before Optimization
+
 - **Runtime:** 24/7 (720 hours/month)
 - **Rate:** $0.18/hour
 - **Monthly Cost:** $130
 
 ### After Optimization
+
 - **Active Runtime:** 2-4 hours/day (60-120 hours/month)
 - **Rate:** $0.18/hour
 - **Monthly Cost:** $11-22
 - **Savings:** $108-119/month (83-91% reduction)
 
 ### Additional Costs (Optional)
+
 - **Polling Service:** $0-5/month (if using Option 4 for Telegram)
 - **Cloudflare Worker:** Free (under 100k requests/day)
 - **Total:** $11-27/month
@@ -100,16 +112,18 @@ WEBHOOK_SECRET=<see_.env_file>
 ## Remaining Tasks
 
 ### 1. Set Codespace Timeout (5 minutes)
+
 1. Go to https://github.com/settings/codespaces
 2. Set "Default idle timeout" to **30 minutes**
 3. Save settings
 
 ### 2. Test Auto-Start Flow (10 minutes)
+
 1. Manually stop Codespace
-2. Trigger webhook: 
+2. Trigger webhook:
    ```bash
    curl -X POST "https://codespace-autostarter.byron-zheng-yuan.workers.dev/" \
-     -H "X-Webhook-Secret: d64346eb8afb50339f691b4e682570787aeb99c8d27a00a5221b1a713962decc" \
+     -H "X-Webhook-Secret: your_webhook_secret_here" \
      -d '{"test":"auto-start"}'
    ```
 3. Wait 30 seconds
@@ -117,13 +131,16 @@ WEBHOOK_SECRET=<see_.env_file>
 5. Verify gateway auto-started
 
 ### 3. Integrate Telegram/WhatsApp (30-60 minutes)
+
 Choose one option from `/workspaces/moltbot-deployment/docs/telegram-integration.md`:
+
 - **Option 1:** Telegram Bot API webhook (requires webhook compatibility)
 - **Option 2:** Modify moltbot to call webhook (code changes)
 - **Option 3:** External proxy service (n8n/Zapier)
 - **Option 4:** Polling script on free tier service (recommended)
 
 ### 4. Monitor and Validate (1 week)
+
 - Track actual usage hours
 - Verify auto-stop is working
 - Confirm auto-start reliability
@@ -150,19 +167,23 @@ Choose one option from `/workspaces/moltbot-deployment/docs/telegram-integration
 ## Troubleshooting
 
 ### Webhook Returns 403
+
 - ✅ **Fixed:** Added User-Agent header
 
 ### Gateway Not Auto-Starting
+
 - Check: `~/gateway.log` for errors
 - Verify: startup.sh is executable (`chmod +x`)
 - Test: Run `/workspaces/moltbot-deployment/startup.sh` manually
 
 ### Codespace Won't Start
+
 - Verify GitHub token has `codespace` scope
 - Check token hasn't expired
 - Review Cloudflare Worker logs: `npx wrangler tail`
 
 ### Cost Not Reducing
+
 - Confirm 30-minute timeout is set
 - Verify keepalive cron was removed: `clawdbot cron list`
 - Check actual usage hours in GitHub billing
