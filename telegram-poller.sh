@@ -6,6 +6,7 @@
 
 # Configuration - Set these as environment variables
 TELEGRAM_BOT_TOKEN="${TELEGRAM_BOT_TOKEN}"
+TELEGRAM_CHAT_ID="${TELEGRAM_CHAT_ID}"
 WEBHOOK_URL="${WEBHOOK_URL:-https://codespace-autostarter.byron-zheng-yuan.workers.dev/}"
 WEBHOOK_SECRET="${WEBHOOK_SECRET}"
 CHECK_INTERVAL="${CHECK_INTERVAL:-10}"
@@ -38,13 +39,28 @@ while true; do
         
         # Only trigger if cooldown period has passed
         if [ $TIME_SINCE_LAST -gt $COOLDOWN ]; then
-            echo "[$(date '+%Y-%m-%d %H:%M:%S')] New message detected! Triggering Codespace wake-up..."
+            CHAT_ID=$(echo "$RESPONSE" | jq -r '.result[0].message.chat.id' 2>/dev/null)
+            USER_NAME=$(echo "$RESPONSE" | jq -r '.result[0].message.from.first_name' 2>/dev/null)
             
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] New message from $USER_NAME (Chat ID: $CHAT_ID)! Triggering Codespace wake-up..."
+            
+            # Send notification back to Telegram
+            if [ -n "$TELEGRAM_CHAT_ID" ]; then
+                curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+                  -d "chat_id=${TELEGRAM_CHAT_ID}" \
+                  -d "text=🚀 Waking up your Moltbot Codespace... (triggered by $USER_NAME)" > /dev/null
+            elif [ -n "$CHAT_ID" ]; then
+                # Fallback to the chat that sent the message if TELEGRAM_CHAT_ID is not set
+                curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+                  -d "chat_id=${CHAT_ID}" \
+                  -d "text=🚀 Waking up your Moltbot Codespace... (triggered by $USER_NAME)" > /dev/null
+            fi
+
             # Trigger Codespace
             TRIGGER_RESPONSE=$(curl -s -X POST "$WEBHOOK_URL" \
               -H "X-Webhook-Secret: $WEBHOOK_SECRET" \
               -H "Content-Type: application/json" \
-              -d '{"source":"telegram-poller","timestamp":"'$(date -Iseconds)'"}')
+              -d "{\"source\":\"telegram-poller\",\"timestamp\":\"$(date -Iseconds)\",\"chat_id\":\"$CHAT_ID\"}")
             
             echo "   Webhook response: $TRIGGER_RESPONSE"
             LAST_TRIGGER=$CURRENT_TIME
